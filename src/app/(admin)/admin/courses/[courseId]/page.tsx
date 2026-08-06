@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { courses, sections, lessons } from "@/db/schema";
 import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
+import { Button, Eyebrow, IndexNumber } from "@/components/ui";
 import {
   updateCourse,
   deleteCourse,
@@ -18,6 +19,11 @@ import {
 } from "../actions";
 
 export const dynamic = "force-dynamic";
+
+const fieldClass =
+  "rounded-sm border border-rule bg-paper-raised px-3 py-2 text-sm outline-none focus:border-indigo";
+const smallFieldClass =
+  "rounded-sm border border-rule bg-paper-raised px-2 py-1 text-sm outline-none focus:border-indigo";
 
 export default async function EditCoursePage({
   params,
@@ -45,39 +51,51 @@ export default async function EditCoursePage({
   const boundCreateSection = createSection.bind(null, courseId);
   const boundUploadThumbnail = uploadCourseThumbnail.bind(null, courseId);
 
+  const lessonIndexById = new Map<string, number>();
+  let indexCounter = 0;
+  for (const section of course.sections) {
+    for (const lesson of section.lessons) {
+      indexCounter += 1;
+      lessonIndexById.set(lesson.id, indexCounter);
+    }
+  }
+
   return (
     <div className="flex max-w-3xl flex-col gap-10">
       <section className="flex flex-col gap-4">
-        <h1 className="text-xl font-semibold">コース編集</h1>
+        <Eyebrow>EDIT</Eyebrow>
+        <h1 className="-mt-2 font-display text-xl font-bold text-ink">
+          コース編集
+        </h1>
         <form action={boundUpdateCourse} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
             タイトル
             <input
               name="title"
               defaultValue={course.title}
               required
-              className="rounded border px-3 py-2"
+              className={fieldClass}
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
             スラッグ
             <input
               name="slug"
               defaultValue={course.slug}
               required
-              className="rounded border px-3 py-2"
+              className={fieldClass}
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
             説明
             <textarea
               name="description"
               defaultValue={course.description ?? ""}
               rows={4}
-              className="rounded border px-3 py-2"
+              className={fieldClass}
             />
           </label>
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm text-ink-soft">
             <input
               type="checkbox"
               name="isPublished"
@@ -86,26 +104,23 @@ export default async function EditCoursePage({
             公開する
           </label>
           <div className="flex items-center gap-3">
-            <button
-              type="submit"
-              className="rounded bg-black px-3 py-2 text-sm text-white"
-            >
+            <Button type="submit" variant="primary" className="px-5">
               保存
-            </button>
+            </Button>
           </div>
         </form>
 
         <div className="flex flex-col gap-2">
-          <p className="text-sm font-medium">サムネイル画像</p>
+          <p className="text-sm font-medium text-ink-soft">サムネイル画像</p>
           {course.thumbnailUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={course.thumbnailUrl}
               alt=""
-              className="h-32 w-56 rounded border object-cover"
+              className="h-32 w-56 rounded-sm border border-rule object-cover"
             />
           ) : (
-            <div className="flex h-32 w-56 items-center justify-center rounded border border-dashed text-xs text-neutral-400">
+            <div className="flex h-32 w-56 items-center justify-center rounded-sm border border-dashed border-rule font-mono text-xs text-muted">
               未設定
             </div>
           )}
@@ -118,21 +133,18 @@ export default async function EditCoursePage({
               name="thumbnail"
               accept="image/png,image/jpeg,image/webp"
               required
-              className="text-sm"
+              className="text-sm text-ink-soft"
             />
-            <button
-              type="submit"
-              className="rounded border px-3 py-1.5 text-sm"
-            >
+            <Button type="submit" variant="secondary" className="px-3 py-1.5 text-sm">
               アップロード
-            </button>
+            </Button>
           </form>
         </div>
 
         <form action={boundDeleteCourse}>
           <ConfirmSubmitButton
             message="このコースを削除しますか？セクション・レッスン・受講データもすべて削除されます。"
-            className="text-sm text-red-600 hover:underline"
+            className="font-mono text-sm text-stamp hover:underline"
           >
             このコースを削除する
           </ConfirmSubmitButton>
@@ -140,10 +152,15 @@ export default async function EditCoursePage({
       </section>
 
       <section className="flex flex-col gap-6">
-        <h2 className="text-lg font-semibold">カリキュラム</h2>
+        <div>
+          <Eyebrow>CURRICULUM</Eyebrow>
+          <h2 className="mt-1 font-display text-lg font-bold text-ink">
+            カリキュラム
+          </h2>
+        </div>
 
         {course.sections.length === 0 && (
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted">
             まだセクションがありません。下のフォームから追加してください。
           </p>
         )}
@@ -178,14 +195,14 @@ export default async function EditCoursePage({
           );
 
           return (
-            <div key={section.id} className="rounded border p-4">
+            <div key={section.id} className="rounded-sm border border-rule bg-paper-raised p-4">
               <div className="flex items-center gap-2">
                 <div className="flex flex-col">
                   <form action={boundMoveUp}>
                     <button
                       type="submit"
                       disabled={sectionIndex === 0}
-                      className="px-1 text-neutral-500 disabled:opacity-30"
+                      className="px-1 text-muted hover:text-indigo disabled:opacity-30"
                     >
                       ▲
                     </button>
@@ -194,7 +211,7 @@ export default async function EditCoursePage({
                     <button
                       type="submit"
                       disabled={sectionIndex === course.sections.length - 1}
-                      className="px-1 text-neutral-500 disabled:opacity-30"
+                      className="px-1 text-muted hover:text-indigo disabled:opacity-30"
                     >
                       ▼
                     </button>
@@ -204,26 +221,23 @@ export default async function EditCoursePage({
                   <input
                     name="title"
                     defaultValue={section.title}
-                    className="flex-1 rounded border px-3 py-1.5 text-sm font-medium"
+                    className={`flex-1 font-medium ${smallFieldClass}`}
                   />
-                  <button
-                    type="submit"
-                    className="rounded border px-3 py-1.5 text-sm"
-                  >
+                  <Button type="submit" variant="secondary" className="px-3 py-1.5 text-sm">
                     保存
-                  </button>
+                  </Button>
                 </form>
                 <form action={boundDeleteSection}>
                   <ConfirmSubmitButton
                     message="このセクションを削除しますか？中のレッスンもすべて削除されます。"
-                    className="text-sm text-red-600 hover:underline"
+                    className="font-mono text-sm text-stamp hover:underline"
                   >
                     削除
                   </ConfirmSubmitButton>
                 </form>
               </div>
 
-              <ul className="mt-4 flex flex-col gap-3 border-l pl-4">
+              <ul className="mt-4 flex flex-col gap-3 border-l border-rule pl-4">
                 {section.lessons.map((lesson, lessonIndex) => {
                   const boundUpdateLesson = updateLesson.bind(
                     null,
@@ -251,14 +265,14 @@ export default async function EditCoursePage({
                   );
 
                   return (
-                    <li key={lesson.id} className="rounded bg-neutral-50 p-3">
+                    <li key={lesson.id} className="rounded-sm bg-paper p-3">
                       <div className="flex items-start gap-2">
                         <div className="flex flex-col pt-1.5">
                           <form action={boundLessonMoveUp}>
                             <button
                               type="submit"
                               disabled={lessonIndex === 0}
-                              className="px-1 text-xs text-neutral-500 disabled:opacity-30"
+                              className="px-1 text-xs text-muted hover:text-indigo disabled:opacity-30"
                             >
                               ▲
                             </button>
@@ -269,12 +283,13 @@ export default async function EditCoursePage({
                               disabled={
                                 lessonIndex === section.lessons.length - 1
                               }
-                              className="px-1 text-xs text-neutral-500 disabled:opacity-30"
+                              className="px-1 text-xs text-muted hover:text-indigo disabled:opacity-30"
                             >
                               ▼
                             </button>
                           </form>
                         </div>
+                        <IndexNumber n={lessonIndexById.get(lesson.id) ?? 0} className="pt-2" />
                         <form
                           action={boundUpdateLesson}
                           className="flex flex-1 flex-col gap-2"
@@ -282,35 +297,32 @@ export default async function EditCoursePage({
                           <input
                             name="title"
                             defaultValue={lesson.title}
-                            className="rounded border px-2 py-1 text-sm"
+                            className={smallFieldClass}
                             placeholder="レッスン名"
                           />
                           <textarea
                             name="description"
                             defaultValue={lesson.description ?? ""}
                             rows={2}
-                            className="rounded border px-2 py-1 text-sm"
+                            className={smallFieldClass}
                             placeholder="説明(任意)"
                           />
                           <input
                             name="youtubeVideo"
                             defaultValue={lesson.youtubeVideoId}
-                            className="rounded border px-2 py-1 text-sm"
+                            className={`font-mono ${smallFieldClass}`}
                             placeholder="YouTube URL または 動画ID"
                           />
                           <div className="flex items-center gap-3">
-                            <button
-                              type="submit"
-                              className="rounded border px-3 py-1 text-xs"
-                            >
+                            <Button type="submit" variant="secondary" className="px-3 py-1 text-xs">
                               保存
-                            </button>
+                            </Button>
                           </div>
                         </form>
                         <form action={boundDeleteLesson}>
                           <ConfirmSubmitButton
                             message="このレッスンを削除しますか？"
-                            className="text-xs text-red-600 hover:underline"
+                            className="font-mono text-xs text-stamp hover:underline"
                           >
                             削除
                           </ConfirmSubmitButton>
@@ -323,35 +335,36 @@ export default async function EditCoursePage({
 
               <form
                 action={boundCreateLesson}
-                className="mt-4 flex flex-col gap-2 border-l pl-4"
+                className="mt-4 flex flex-col gap-2 border-l border-rule pl-4"
               >
-                <p className="text-xs font-medium text-neutral-500">
+                <p className="font-mono text-xs text-muted">
                   レッスンを追加
                 </p>
                 <input
                   name="title"
                   required
                   placeholder="レッスン名"
-                  className="rounded border px-2 py-1 text-sm"
+                  className={smallFieldClass}
                 />
                 <textarea
                   name="description"
                   rows={2}
                   placeholder="説明(任意)"
-                  className="rounded border px-2 py-1 text-sm"
+                  className={smallFieldClass}
                 />
                 <input
                   name="youtubeVideo"
                   required
                   placeholder="YouTube URL または 動画ID"
-                  className="rounded border px-2 py-1 text-sm"
+                  className={`font-mono ${smallFieldClass}`}
                 />
-                <button
+                <Button
                   type="submit"
-                  className="self-start rounded border px-3 py-1 text-xs"
+                  variant="secondary"
+                  className="self-start px-3 py-1 text-xs"
                 >
                   追加
-                </button>
+                </Button>
               </form>
             </div>
           );
@@ -359,18 +372,15 @@ export default async function EditCoursePage({
 
         <form
           action={boundCreateSection}
-          className="flex items-end gap-2 rounded border border-dashed p-4"
+          className="flex items-end gap-2 rounded-sm border border-dashed border-rule p-4"
         >
-          <label className="flex flex-1 flex-col gap-1 text-sm">
+          <label className="flex flex-1 flex-col gap-1 text-sm text-ink-soft">
             新しいセクション名
-            <input name="title" required className="rounded border px-3 py-2" />
+            <input name="title" required className={fieldClass} />
           </label>
-          <button
-            type="submit"
-            className="rounded bg-black px-3 py-2 text-sm text-white"
-          >
+          <Button type="submit" variant="primary" className="px-5">
             セクションを追加
-          </button>
+          </Button>
         </form>
       </section>
     </div>

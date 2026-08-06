@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/db";
 import { courses } from "@/db/schema";
 import { desc } from "drizzle-orm";
+import { Eyebrow, LinkButton, StatusBadge } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -13,43 +14,41 @@ export default async function AdminCoursesPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">コース一覧</h1>
-        <Link
-          href="/admin/courses/new"
-          className="rounded bg-black px-3 py-2 text-sm text-white"
-        >
+        <div>
+          <Eyebrow>ADMIN</Eyebrow>
+          <h1 className="mt-1 font-display text-xl font-bold text-ink">
+            コース一覧
+          </h1>
+        </div>
+        <LinkButton href="/admin/courses/new" variant="primary">
           新規コース作成
-        </Link>
+        </LinkButton>
       </div>
 
       {allCourses.length === 0 ? (
-        <p className="text-neutral-500">まだコースがありません。</p>
+        <p className="text-muted">まだコースがありません。</p>
       ) : (
-        <ul className="flex flex-col divide-y rounded border">
+        <ul className="flex flex-col divide-y divide-rule rounded-sm border border-rule bg-paper-raised">
           {allCourses.map((course) => (
             <li key={course.id} className="flex items-center justify-between px-4 py-3">
               <div>
                 <Link
                   href={`/admin/courses/${course.id}`}
-                  className="font-medium hover:underline"
+                  className="font-medium text-ink hover:text-indigo hover:underline"
                 >
                   {course.title}
                 </Link>
-                <p className="text-sm text-neutral-500">/{course.slug}</p>
+                <p className="font-mono text-xs text-muted">/{course.slug}</p>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <span
-                  className={
-                    course.isPublished
-                      ? "rounded bg-green-100 px-2 py-0.5 text-green-700"
-                      : "rounded bg-neutral-100 px-2 py-0.5 text-neutral-600"
-                  }
-                >
-                  {course.isPublished ? "公開中" : "下書き"}
-                </span>
+                <StatusBadge
+                  active={course.isPublished}
+                  activeLabel="公開中"
+                  inactiveLabel="下書き"
+                />
                 <Link
                   href={`/admin/courses/${course.id}/enrollments`}
-                  className="text-neutral-600 hover:underline"
+                  className="text-ink-soft hover:text-indigo hover:underline"
                 >
                   受講権限
                 </Link>

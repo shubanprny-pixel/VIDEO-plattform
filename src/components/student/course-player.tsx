@@ -8,7 +8,7 @@ export function CoursePlayer({
   lessonId: string;
 }) {
   return (
-    <div className="aspect-video w-full overflow-hidden rounded bg-black" data-lesson-id={lessonId}>
+    <div className="aspect-video w-full overflow-hidden rounded-sm border border-rule bg-black" data-lesson-id={lessonId}>
       <iframe
         key={lessonId}
         src={embedUrl}

@@ -4,6 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { Button, Eyebrow } from "@/components/ui";
+
+const fieldClass =
+  "border-b border-rule bg-transparent px-1 py-2 text-ink outline-none transition-colors focus:border-indigo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,55 +36,50 @@ export default function LoginPage() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">ログイン</h1>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <div>
+        <Eyebrow>WELCOME BACK</Eyebrow>
+        <h1 className="mt-1 font-display text-2xl font-bold text-ink">ログイン</h1>
+      </div>
       {error && (
-        <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-600">
+        <p className="rounded-sm border border-stamp/30 bg-stamp/5 px-3 py-2 text-sm text-stamp">
           {error}
         </p>
       )}
-      <button
-        type="button"
-        onClick={handleGoogleSignIn}
-        className="rounded border px-3 py-2 text-sm hover:bg-neutral-50"
-      >
+      <Button type="button" variant="secondary" onClick={handleGoogleSignIn}>
         Googleでログイン
-      </button>
-      <div className="flex items-center gap-2 text-xs text-neutral-400">
-        <div className="h-px flex-1 bg-neutral-200" />
+      </Button>
+      <div className="flex items-center gap-3 font-mono text-xs text-muted">
+        <div className="h-px flex-1 bg-rule" />
         または
-        <div className="h-px flex-1 bg-neutral-200" />
+        <div className="h-px flex-1 bg-rule" />
       </div>
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1 text-sm text-ink-soft">
         メールアドレス
         <input
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded border px-3 py-2"
+          className={fieldClass}
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1 text-sm text-ink-soft">
         パスワード
         <input
           type="password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded border px-3 py-2"
+          className={fieldClass}
         />
       </label>
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded bg-black px-3 py-2 text-white disabled:opacity-50"
-      >
+      <Button type="submit" variant="primary" disabled={loading} className="mt-2 py-2.5">
         {loading ? "ログイン中..." : "ログイン"}
-      </button>
-      <p className="text-sm text-neutral-600">
+      </Button>
+      <p className="text-sm text-muted">
         アカウントをお持ちでない方は{" "}
-        <Link href="/signup" className="underline">
+        <Link href="/signup" className="text-indigo hover:underline">
           新規登録
         </Link>
       </p>

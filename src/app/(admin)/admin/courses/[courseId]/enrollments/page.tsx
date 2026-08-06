@@ -4,9 +4,13 @@ import { eq, desc } from "drizzle-orm";
 import { db } from "@/db";
 import { courses, enrollments } from "@/db/schema";
 import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
+import { Button, Eyebrow, StatusBadge } from "@/components/ui";
 import { grantEnrollment, revokeEnrollment, reactivateEnrollment } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const fieldClass =
+  "rounded-sm border border-rule bg-paper-raised px-3 py-2 text-sm outline-none focus:border-indigo";
 
 export default async function CourseEnrollmentsPage({
   params,
@@ -33,40 +37,38 @@ export default async function CourseEnrollmentsPage({
       <div>
         <Link
           href={`/admin/courses/${courseId}`}
-          className="text-sm text-neutral-500 hover:underline"
+          className="font-mono text-xs text-muted hover:text-indigo"
         >
           ← コース編集に戻る
         </Link>
-        <h1 className="mt-2 text-xl font-semibold">
+        <Eyebrow className="mt-3 block">ENROLLMENTS</Eyebrow>
+        <h1 className="mt-1 font-display text-xl font-bold text-ink">
           受講権限管理: {course.title}
         </h1>
       </div>
 
       <form action={boundGrant} className="flex items-end gap-2">
-        <label className="flex flex-1 flex-col gap-1 text-sm">
+        <label className="flex flex-1 flex-col gap-1 text-sm text-ink-soft">
           メールアドレスで受講権限を付与
           <input
             type="email"
             name="email"
             required
             placeholder="student@example.com"
-            className="rounded border px-3 py-2"
+            className={fieldClass}
           />
         </label>
-        <button
-          type="submit"
-          className="rounded bg-black px-3 py-2 text-sm text-white"
-        >
+        <Button type="submit" variant="primary" className="px-4">
           付与する
-        </button>
+        </Button>
       </form>
 
       {courseEnrollments.length === 0 ? (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted">
           まだ受講権限を付与されたユーザーはいません。
         </p>
       ) : (
-        <ul className="flex flex-col divide-y rounded border">
+        <ul className="flex flex-col divide-y divide-rule rounded-sm border border-rule bg-paper-raised">
           {courseEnrollments.map((enrollment) => {
             const boundRevoke = revokeEnrollment.bind(
               null,
@@ -84,31 +86,27 @@ export default async function CourseEnrollmentsPage({
                 className="flex items-center justify-between px-4 py-3 text-sm"
               >
                 <div>
-                  <p className="font-medium">{enrollment.user.name}</p>
-                  <p className="text-neutral-500">{enrollment.user.email}</p>
+                  <p className="font-medium text-ink">{enrollment.user.name}</p>
+                  <p className="text-muted">{enrollment.user.email}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span
-                    className={
-                      enrollment.status === "active"
-                        ? "rounded bg-green-100 px-2 py-0.5 text-green-700"
-                        : "rounded bg-neutral-100 px-2 py-0.5 text-neutral-500"
-                    }
-                  >
-                    {enrollment.status === "active" ? "有効" : "剥奪済み"}
-                  </span>
+                  <StatusBadge
+                    active={enrollment.status === "active"}
+                    activeLabel="有効"
+                    inactiveLabel="剥奪済み"
+                  />
                   {enrollment.status === "active" ? (
                     <form action={boundRevoke}>
                       <ConfirmSubmitButton
                         message="このユーザーの受講権限を剥奪しますか？"
-                        className="text-red-600 hover:underline"
+                        className="text-stamp hover:underline"
                       >
                         剥奪
                       </ConfirmSubmitButton>
                     </form>
                   ) : (
                     <form action={boundReactivate}>
-                      <button type="submit" className="text-neutral-700 hover:underline">
+                      <button type="submit" className="text-indigo hover:underline">
                         再付与
                       </button>
                     </form>

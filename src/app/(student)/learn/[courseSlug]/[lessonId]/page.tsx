@@ -8,6 +8,7 @@ import { canAccessCourse } from "@/lib/access";
 import { youtubeEmbedUrl } from "@/lib/youtube";
 import { CoursePlayer } from "@/components/student/course-player";
 import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
+import { Button, Eyebrow, Stamp } from "@/components/ui";
 import {
   markLessonComplete,
   markLessonIncomplete,
@@ -44,7 +45,7 @@ export default async function LessonPage({
   );
   if (!allowed) {
     return (
-      <p className="text-sm text-neutral-600">
+      <p className="text-sm text-muted">
         このコースを受講する権限がありません。
       </p>
     );
@@ -107,9 +108,11 @@ export default async function LessonPage({
   return (
     <div className="flex max-w-3xl flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold">{lesson.title}</h1>
+        <h1 className="font-display text-xl font-bold text-ink">
+          {lesson.title}
+        </h1>
         {lesson.description && (
-          <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-600">
+          <p className="mt-1 whitespace-pre-wrap text-sm text-ink-soft">
             {lesson.description}
           </p>
         )}
@@ -122,28 +125,27 @@ export default async function LessonPage({
 
       <div className="flex items-center gap-4">
         {isCompleted ? (
-          <form action={boundMarkIncomplete}>
+          <form action={boundMarkIncomplete} className="flex items-center gap-2">
+            <Stamp size="md" />
             <button
               type="submit"
-              className="rounded border px-4 py-2 text-sm text-neutral-600"
+              className="font-mono text-xs text-muted hover:text-indigo hover:underline"
             >
-              ✓ 完了済み（取り消す）
+              完了済み（取り消す）
             </button>
           </form>
         ) : (
           <form action={boundMarkComplete}>
-            <button
-              type="submit"
-              className="rounded bg-black px-4 py-2 text-sm text-white"
-            >
+            <Button type="submit" variant="primary">
               このレッスンを完了にする
-            </button>
+            </Button>
           </form>
         )}
       </div>
 
-      <section className="flex flex-col gap-4 border-t pt-6">
-        <h2 className="font-semibold">コメント・質問</h2>
+      <section className="flex flex-col gap-4 border-t border-rule pt-6">
+        <Eyebrow>Q&amp;A</Eyebrow>
+        <h2 className="-mt-2 font-display font-bold text-ink">コメント・質問</h2>
 
         <form action={boundPostTopLevel} className="flex flex-col gap-2">
           <textarea
@@ -151,18 +153,15 @@ export default async function LessonPage({
             required
             rows={3}
             placeholder="質問やコメントを入力"
-            className="rounded border px-3 py-2 text-sm"
+            className="rounded-sm border border-rule bg-paper-raised px-3 py-2 text-sm outline-none focus:border-indigo"
           />
-          <button
-            type="submit"
-            className="self-start rounded bg-black px-3 py-1.5 text-sm text-white"
-          >
+          <Button type="submit" variant="primary" className="self-start px-4 py-1.5">
             投稿する
-          </button>
+          </Button>
         </form>
 
         {topLevelComments.length === 0 ? (
-          <p className="text-sm text-neutral-500">まだコメントはありません。</p>
+          <p className="text-sm text-muted">まだコメントはありません。</p>
         ) : (
           <ul className="flex flex-col gap-6">
             {topLevelComments.map((comment) => {
@@ -198,7 +197,7 @@ export default async function LessonPage({
                     <form action={boundDelete}>
                       <ConfirmSubmitButton
                         message="このコメントを削除しますか？"
-                        className="self-start text-xs text-red-600 hover:underline"
+                        className="self-start font-mono text-xs text-stamp hover:underline"
                       >
                         削除
                       </ConfirmSubmitButton>
@@ -206,7 +205,7 @@ export default async function LessonPage({
                   )}
 
                   {replies.length > 0 && (
-                    <ul className="ml-6 flex flex-col gap-3 border-l pl-4">
+                    <ul className="ml-6 flex flex-col gap-3 border-l border-rule pl-4">
                       {replies.map((reply) => {
                         const boundDeleteReply = deleteComment.bind(
                           null,
@@ -231,7 +230,7 @@ export default async function LessonPage({
                               <form action={boundDeleteReply}>
                                 <ConfirmSubmitButton
                                   message="このコメントを削除しますか？"
-                                  className="self-start text-xs text-red-600 hover:underline"
+                                  className="self-start font-mono text-xs text-stamp hover:underline"
                                 >
                                   削除
                                 </ConfirmSubmitButton>
@@ -249,14 +248,11 @@ export default async function LessonPage({
                       required
                       rows={2}
                       placeholder="返信する"
-                      className="rounded border px-3 py-1.5 text-sm"
+                      className="rounded-sm border border-rule bg-paper-raised px-3 py-1.5 text-sm outline-none focus:border-indigo"
                     />
-                    <button
-                      type="submit"
-                      className="self-start rounded border px-3 py-1 text-xs"
-                    >
+                    <Button type="submit" variant="secondary" className="self-start px-3 py-1 text-xs">
                       返信を投稿
-                    </button>
+                    </Button>
                   </form>
                 </li>
               );
@@ -267,7 +263,7 @@ export default async function LessonPage({
 
       <Link
         href={`/learn/${encodeURIComponent(course.slug)}`}
-        className="text-sm text-neutral-500 hover:underline"
+        className="text-sm text-muted hover:text-indigo hover:underline"
       >
         コース一覧に戻る
       </Link>
@@ -290,10 +286,10 @@ function CommentBody({
 }) {
   return (
     <div>
-      <div className="flex items-center gap-2 text-xs text-neutral-500">
-        <span className="font-medium text-neutral-700">{name}</span>
+      <div className="flex items-center gap-2 font-mono text-xs text-muted">
+        <span className="font-medium text-ink-soft">{name}</span>
         {isAdmin && (
-          <span className="rounded bg-neutral-800 px-1.5 py-0.5 text-white">
+          <span className="rounded-sm bg-indigo px-1.5 py-0.5 text-paper">
             講師
           </span>
         )}
@@ -301,7 +297,7 @@ function CommentBody({
       </div>
       <p className="mt-1 whitespace-pre-wrap text-sm">
         {isDeleted ? (
-          <span className="text-neutral-400">このコメントは削除されました</span>
+          <span className="text-muted">このコメントは削除されました</span>
         ) : (
           body
         )}

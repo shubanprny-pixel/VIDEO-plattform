@@ -6,6 +6,7 @@ import { lessonProgress } from "@/db/schema";
 import { requireUser } from "@/lib/session";
 import { canAccessCourse } from "@/lib/access";
 import { getCourseWithCurriculum } from "./data";
+import { Eyebrow, IndexNumber, LinkButton, Stamp } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -31,16 +32,15 @@ export default async function LearnLayout({
   if (!allowed) {
     return (
       <div className="mx-auto max-w-xl px-6 py-24 text-center">
-        <h1 className="text-lg font-semibold">このコースを受講する権限がありません</h1>
-        <p className="mt-2 text-sm text-neutral-600">
+        <h1 className="font-display text-xl font-bold text-ink">
+          このコースを受講する権限がありません
+        </h1>
+        <p className="mt-2 text-sm text-muted">
           受講をご希望の方は講師にお問い合わせください。
         </p>
-        <Link
-          href="/dashboard"
-          className="mt-6 inline-block rounded bg-black px-4 py-2 text-sm text-white"
-        >
+        <LinkButton href="/dashboard" variant="primary" className="mt-6">
           マイページへ戻る
-        </Link>
+        </LinkButton>
       </div>
     );
   }
@@ -61,50 +61,63 @@ export default async function LearnLayout({
     0,
   );
 
+  const lessonIndexById = new Map<string, number>();
+  let indexCounter = 0;
+  for (const section of course.sections) {
+    for (const lesson of section.lessons) {
+      indexCounter += 1;
+      lessonIndexById.set(lesson.id, indexCounter);
+    }
+  }
+
   return (
     <div className="flex flex-1">
-      <aside className="w-72 shrink-0 border-r px-4 py-6">
-        <Link href="/dashboard" className="text-xs text-neutral-500 hover:underline">
+      <aside className="w-72 shrink-0 border-r border-rule px-5 py-6">
+        <Link href="/dashboard" className="font-mono text-xs text-muted hover:text-indigo">
           ← マイページ
         </Link>
-        <h1 className="mt-2 font-semibold">{course.title}</h1>
+        <h1 className="mt-3 font-display text-lg font-bold text-ink">
+          {course.title}
+        </h1>
         {totalLessons > 0 && (
-          <p className="mb-4 text-xs text-neutral-500">
-            {completedLessonIds.size}/{totalLessons}レッスン完了
-          </p>
+          <Eyebrow className="mb-4 block">
+            {completedLessonIds.size}/{totalLessons} 完了
+          </Eyebrow>
         )}
-        <nav className="mt-4 flex flex-col gap-4">
+        <nav className="mt-4 flex flex-col gap-5">
           {course.sections.map((section) => (
             <div key={section.id}>
-              <p className="mb-1 text-xs font-medium text-neutral-500">
+              <p className="mb-1 font-mono text-xs text-muted">
                 {section.title}
               </p>
-              <ul className="flex flex-col gap-0.5">
-                {section.lessons.map((lesson) => (
-                  <li key={lesson.id}>
-                    <Link
-                      href={`/learn/${encodeURIComponent(course.slug)}/${lesson.id}`}
-                      className="flex items-center gap-2 rounded px-2 py-1.5 text-sm text-neutral-700 hover:bg-neutral-100"
-                    >
-                      <span
-                        className={
-                          completedLessonIds.has(lesson.id)
-                            ? "text-green-600"
-                            : "text-neutral-300"
-                        }
+              <ul className="flex flex-col">
+                {section.lessons.map((lesson) => {
+                  const done = completedLessonIds.has(lesson.id);
+                  return (
+                    <li key={lesson.id}>
+                      <Link
+                        href={`/learn/${encodeURIComponent(course.slug)}/${lesson.id}`}
+                        className="flex items-center gap-2.5 rounded-sm px-1.5 py-1.5 text-sm text-ink-soft hover:bg-paper-raised hover:text-ink"
                       >
-                        ✓
-                      </span>
-                      {lesson.title}
-                    </Link>
-                  </li>
-                ))}
+                        {done ? (
+                          <Stamp />
+                        ) : (
+                          <IndexNumber
+                            n={lessonIndexById.get(lesson.id) ?? 0}
+                            className="w-6"
+                          />
+                        )}
+                        {lesson.title}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
         </nav>
       </aside>
-      <main className="flex-1 px-8 py-6">{children}</main>
+      <main className="flex-1 px-8 py-8">{children}</main>
     </div>
   );
 }

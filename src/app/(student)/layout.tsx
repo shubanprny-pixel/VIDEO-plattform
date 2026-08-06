@@ -13,23 +13,23 @@ export default async function StudentLayout({
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b px-6 py-4">
+      <header className="border-b border-rule px-6 py-4">
         <nav className="flex items-center gap-6 text-sm">
-          <Link href="/" className="font-semibold">
+          <Link href="/" className="font-display text-lg font-bold text-ink">
             動画講座プラットフォーム
           </Link>
-          <Link href="/courses" className="text-neutral-600 hover:text-black">
+          <Link href="/courses" className="text-ink-soft transition-colors hover:text-indigo">
             コース一覧
           </Link>
-          <Link href="/dashboard" className="text-neutral-600 hover:text-black">
+          <Link href="/dashboard" className="text-ink-soft transition-colors hover:text-indigo">
             マイページ
           </Link>
           {isAdmin && <RoleSwitchTabs active="student" />}
           <LogoutButton
             className={
               isAdmin
-                ? "text-neutral-600 hover:underline"
-                : "ml-auto text-neutral-600 hover:underline"
+                ? "text-ink-soft transition-colors hover:text-indigo"
+                : "ml-auto text-ink-soft transition-colors hover:text-indigo"
             }
           />
         </nav>

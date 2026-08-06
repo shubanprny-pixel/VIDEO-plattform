@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { LogoutButton } from "@/components/logout-button";
+import { LinkButton } from "@/components/ui";
 
 export default async function MarketingLayout({
   children,
@@ -11,33 +12,42 @@ export default async function MarketingLayout({
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b px-6 py-4">
-        <nav className="flex items-center gap-6 text-sm">
-          <Link href="/" className="font-semibold">
+      <header className="border-b border-rule px-6 py-4">
+        <nav className="mx-auto flex max-w-5xl items-center gap-8 text-sm">
+          <Link
+            href="/"
+            className="font-display text-lg font-bold tracking-wide text-ink"
+          >
             動画講座プラットフォーム
           </Link>
-          <Link href="/courses" className="text-neutral-600 hover:text-black">
+          <Link
+            href="/courses"
+            className="text-ink-soft transition-colors hover:text-indigo"
+          >
             コース一覧
           </Link>
-          <div className="ml-auto flex items-center gap-4">
+          <div className="ml-auto flex items-center gap-5">
             {session ? (
               <>
-                <Link href="/dashboard" className="hover:underline">
+                <Link
+                  href="/dashboard"
+                  className="text-ink-soft transition-colors hover:text-indigo"
+                >
                   マイページ
                 </Link>
-                <LogoutButton className="hover:underline" />
+                <LogoutButton className="text-ink-soft transition-colors hover:text-indigo" />
               </>
             ) : (
               <>
-                <Link href="/login" className="hover:underline">
+                <Link
+                  href="/login"
+                  className="text-ink-soft transition-colors hover:text-indigo"
+                >
                   ログイン
                 </Link>
-                <Link
-                  href="/signup"
-                  className="rounded bg-black px-3 py-1.5 text-white"
-                >
+                <LinkButton href="/signup" variant="primary">
                   新規登録
-                </Link>
+                </LinkButton>
               </>
             )}
           </div>
